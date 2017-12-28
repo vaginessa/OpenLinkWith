@@ -5,18 +5,25 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
+
 public final class Urls {
 
-    private static final Fixer[] URL_FIXERS = new Fixer[]{
+    private static final Set<Fixer> URL_FIXERS = unmodifiableSet(new HashSet<>(asList(
             new FacebookFixer(),
             new TwitterFixer(),
             new EbayFixer(),
             new AmazonFixer(),
             new DailyMailFixer(),
-    };
+            new VkFixer()
+    )));
+    private static final Pattern URL_PATTERN = Pattern.compile("\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))", Pattern.CASE_INSENSITIVE);
 
     public static String fixUrls(String url) {
         for (Fixer urlFixer : URL_FIXERS) {
@@ -25,6 +32,7 @@ public final class Urls {
         return url;
     }
 
+    @Nullable
     public static String extractUrlFrom(Intent intent, ShareCompat.IntentReader reader) {
         CharSequence text = reader.getText();
         if (text == null) {
@@ -39,16 +47,19 @@ public final class Urls {
     }
 
     @Nullable
-    private static String findFirstUrl(@Nullable CharSequence text) {
+    public static String findFirstUrl(@Nullable CharSequence text) {
         if (text == null) {
             return null;
         }
-        final Matcher matcher = Pattern.compile("\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))", Pattern.CASE_INSENSITIVE)
-                .matcher(text);
-        if (matcher.find()) {
-            return matcher.group();
+        Matcher matcher = URL_PATTERN.matcher(text);
+        if (!matcher.find()) {
+            return null;
         }
-        return null;
+        String url = matcher.group();
+        if (url.startsWith("content://") || url.startsWith("file://")) {
+            return null;
+        }
+        return url;
     }
 
     private static class FacebookFixer implements Fixer {
@@ -133,16 +144,10 @@ public final class Urls {
         @Nullable
         static String extractAmazonASIN(String foundUrl) {
             try {
-                final Matcher matcher = Pattern.compile(".*//www.amazon.(?:com|co\\.uk|co.jp|com\\.au|com\\.br|ca|cn|fr|de|in|it|com\\.mx|nl|es)/gp/aw/d/(\\w{10})/.*", Pattern.CASE_INSENSITIVE)
-                        .matcher(foundUrl);
-                if (matcher.find()) {
-                    return matcher.group(1);
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                //http://www.amazon.com/Garmin-Speed-Cadence-Bike-Sensor/dp/B000BFNOT8
-                final Matcher matcher = Pattern.compile(".*//www.amazon.(?:com|co\\.uk|co.jp|com\\.au|com\\.br|ca|cn|fr|de|in|it|com\\.mx|nl|es)/(?:.+/)?dp/(\\w{10}).*", Pattern.CASE_INSENSITIVE)
+                // https://www.amazon.de/gp/product/B01LYYM9I3
+                // https://www.amazon.com/gp/aw/d/B001GNBJQO?vs=1
+                // http://www.amazon.com/Garmin-Speed-Cadence-Bike-Sensor/dp/B000BFNOT8
+                final Matcher matcher = Pattern.compile(".*//www.amazon.(?:com|co\\.uk|co.jp|com\\.au|com\\.br|ca|cn|fr|de|in|it|com\\.mx|nl|es)/(?:.+/)?(?:gp/aw/d|gp/product|dp)+/(\\w{10}).*", Pattern.CASE_INSENSITIVE)
                         .matcher(foundUrl);
                 if (matcher.find()) {
                     return matcher.group(1);
@@ -174,6 +179,13 @@ public final class Urls {
             } catch (Exception ignored) {
             }
             return null;
+        }
+    }
+
+    private static class VkFixer implements Fixer {
+        @Override
+        public String fix(String url) {
+            return url.replace("//m.vk.com", "//vk.com");
         }
     }
 

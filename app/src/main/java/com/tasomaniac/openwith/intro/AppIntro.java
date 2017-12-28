@@ -1,7 +1,6 @@
 package com.tasomaniac.openwith.intro;
 
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,8 +13,8 @@ import android.widget.TextView;
 
 import com.tasomaniac.openwith.R;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import dagger.android.support.DaggerAppCompatActivity;
 
@@ -23,12 +22,9 @@ public abstract class AppIntro extends DaggerAppCompatActivity {
 
     private PagerAdapter mPagerAdapter;
     private AppIntroViewPager pager;
-    private List<Fragment> fragments = new Vector<>();
+    private List<Fragment> fragments = new ArrayList<>();
     private int slidesNumber;
-    private Vibrator mVibrator;
     private CircularIndicatorView mController;
-    private boolean isVibrateOn = false;
-    private int vibrateIntensity = 20;
     private boolean skipButtonEnabled = true;
     private boolean baseProgressButtonEnabled = true;
     private boolean progressButtonEnabled = true;
@@ -40,7 +36,6 @@ public abstract class AppIntro extends DaggerAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.intro_layout);
@@ -48,50 +43,29 @@ public abstract class AppIntro extends DaggerAppCompatActivity {
         skipButton = findViewById(R.id.skip);
         nextButton = findViewById(R.id.next);
         doneButton = findViewById(R.id.done);
-        mVibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
         mPagerAdapter = new PagerAdapter(super.getSupportFragmentManager(), fragments);
-        pager = (AppIntroViewPager) findViewById(R.id.view_pager);
+        pager = findViewById(R.id.view_pager);
         pager.setAdapter(this.mPagerAdapter);
 
         if (savedInstanceState != null) {
             restoreLockingState(savedInstanceState);
         }
 
-        skipButton.setOnClickListener(v -> {
-            if (isVibrateOn) {
-                mVibrator.vibrate(vibrateIntensity);
-            }
-            onSkipPressed();
-        });
+        skipButton.setOnClickListener(v -> onSkipPressed());
 
         nextButton.setOnClickListener(v -> {
-            if (isVibrateOn) {
-                mVibrator.vibrate(vibrateIntensity);
-            }
             pager.setCurrentItem(pager.getCurrentItem() + 1);
             onNextPressed();
         });
 
-        doneButton.setOnClickListener(v -> {
-            if (isVibrateOn) {
-                mVibrator.vibrate(vibrateIntensity);
-            }
-            onDonePressed();
-        });
+        doneButton.setOnClickListener(v -> onDonePressed());
 
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), fragments);
-        pager = (AppIntroViewPager) findViewById(R.id.view_pager);
+        pager = findViewById(R.id.view_pager);
 
         pager.setAdapter(this.mPagerAdapter);
 
-        /**
-         *  ViewPager.setOnPageChangeListener is now deprecated. Use addOnPageChangeListener() instead of it.
-         */
-        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
+        pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
             @Override
             public void onPageSelected(int position) {
@@ -112,11 +86,6 @@ public abstract class AppIntro extends DaggerAppCompatActivity {
                     setProgressButtonEnabled(progressButtonEnabled);
                 }
                 skipButton.setVisibility(skipButtonEnabled ? View.VISIBLE : View.GONE);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
             }
         });
         pager.setCurrentItem(savedCurrentItem); //required for triggering onPageSelected for first page
@@ -155,7 +124,7 @@ public abstract class AppIntro extends DaggerAppCompatActivity {
     }
 
     private void initController() {
-        mController = (CircularIndicatorView) findViewById(R.id.indicator);
+        mController = findViewById(R.id.indicator);
         mController.initialize(slidesNumber);
     }
 
@@ -175,7 +144,7 @@ public abstract class AppIntro extends DaggerAppCompatActivity {
     @Override
     public boolean onKeyDown(int code, KeyEvent event) {
         if (code == KeyEvent.KEYCODE_ENTER || code == KeyEvent.KEYCODE_BUTTON_A || code == KeyEvent.KEYCODE_DPAD_CENTER) {
-            ViewPager vp = (ViewPager) this.findViewById(R.id.view_pager);
+            ViewPager vp = this.findViewById(R.id.view_pager);
             if (vp.getCurrentItem() == vp.getAdapter().getCount() - 1) {
                 onDonePressed();
             } else {
@@ -209,7 +178,7 @@ public abstract class AppIntro extends DaggerAppCompatActivity {
     }
 
     void setDoneText(@Nullable final String text) {
-        TextView doneText = (TextView) findViewById(R.id.done);
+        TextView doneText = findViewById(R.id.done);
         doneText.setText(text);
     }
 

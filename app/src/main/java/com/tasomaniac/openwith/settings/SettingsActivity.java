@@ -28,14 +28,12 @@ public class SettingsActivity extends DaggerAppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!tutorialShown.get()) {
-            startActivity(IntroActivity.newIntent(this, true));
+            startActivity(IntroActivity.newIntent(this));
             tutorialShown.set(true);
         }
 
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
-
-        analytics.sendScreenView("Settings");
 
         toolbar.setNavigationIcon(R.drawable.ic_action_done);
         toolbar.setNavigationContentDescription(R.string.done);
@@ -47,6 +45,8 @@ public class SettingsActivity extends DaggerAppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, SettingsFragment.newInstance())
                     .commit();
+
+            analytics.sendScreenView("Settings");
         }
     }
 

@@ -1,6 +1,6 @@
 <resources>
   <string name="app_name" translatable="false">Open Link With</string>
-  <string name="open_with">\u00A0Open With…</string>
+  <string name="open_with">Open With…</string>
 
   <string name="use_a_different_app">Use a different app</string>
   <string name="activity_resolver_use_once">Just Once</string>
@@ -37,6 +37,21 @@
   <string name="pref_key_usage_stats" translatable="false">pref_usage_stats</string>
   <string name="pref_title_usage_stats">Usage Stats</string>
   <string name="pref_summary_usage_stats">Improve the application sorting by giving access to Usage Stats.</string>
+
+  <string name="pref_title_category_display">Display</string>
+
+  <string name="pref_key_night_mode" translatable="false">pref_night_mode</string>
+  <string name="pref_value_night_mode_off" translatable="false">off</string>
+  <string name="pref_value_night_mode_on" translatable="false">on</string>
+  <string name="pref_title_night_mode">Night Mode</string>
+  <string name="pref_entry_night_mode_off">Off</string>
+  <string name="pref_entry_night_mode_on">On</string>
+
+  <string name="pref_key_category_clipboard" translatable="false">pref_category_clipboard</string>
+  <string name="pref_title_category_clipboard">Link you copied</string>
+
+  <string name="pref_key_clipboard" translatable="false">pref_clipboard</string>
+  <string name="pref_title_clipboard">Click to open with…</string>
 
   <string name="pref_title_category_others">Others</string>
 
@@ -77,11 +92,13 @@
   ]]></string>
   <string name="usage_access_give_access">Give Access</string>
   <string name="error">Error</string>
+  <string name="next">Next</string>
   <string name="error_usage_access_not_found">Usage Access Settings cannot be open.\n\nYou may access it by going into Settings -> Security</string>
   <string name="error_cannot_start_activity">Failed to open the link with selected app. Try again later.</string>
 
   <string name="add_to_homescreen">Add To Home screen</string>
   <string name="add">Add</string>
   <string name="cancel">Cancel</string>
-  <string name="dialog_hint_add_to_home_screen">Shortcut title</string>
+  <string name="add_to_home_screen_dialog_hint">Shortcut title</string>
+  <string name="add_to_home_screen_error">Device does not support shortcuts!</string>
 </resources>

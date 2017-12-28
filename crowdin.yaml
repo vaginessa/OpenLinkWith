@@ -12,7 +12,7 @@ files:
         es-ES: es
         fi: fi
         fr: fr
-        in-ID: in
+        id: in
         it: it
         ja: ja
         ko: ko
@@ -20,7 +20,9 @@ files:
         pt-BR: pt-rBR
         pt-PT: pt-rPT
         ru: ru
+        sv-SE: sv
         tr: tr
         uk: uk
+        vi: vi
         zh-CN: zh-rCN
 

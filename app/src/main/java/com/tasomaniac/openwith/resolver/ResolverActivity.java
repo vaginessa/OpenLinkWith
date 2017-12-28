@@ -38,11 +38,13 @@ import com.tasomaniac.openwith.ComponentActivity;
 import com.tasomaniac.openwith.HeaderAdapter;
 import com.tasomaniac.openwith.R;
 import com.tasomaniac.openwith.homescreen.AddToHomeScreenDialogFragment;
+import com.tasomaniac.openwith.util.Intents;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * This activity is displayed when the system attempts to start an Intent for
@@ -77,7 +79,7 @@ public class ResolverActivity extends ComponentActivity<ResolverComponent> imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getComponent().inject(this);
+        getComponent().injectMembers(this);
         registerPackageMonitor();
     }
 
@@ -183,8 +185,9 @@ public class ResolverActivity extends ComponentActivity<ResolverComponent> imple
 
         int checkedPos = savedInstanceState.getInt(KEY_CHECKED_POS);
         if (checkedPos != RecyclerView.NO_POSITION) {
-            alwaysButton.setEnabled(true);
-            onceButton.setEnabled(true);
+            if (alwaysButton != null && onceButton != null) {
+                enableActionButtons();
+            }
             adapter.setItemChecked(checkedPos);
         }
     }
@@ -194,14 +197,20 @@ public class ResolverActivity extends ComponentActivity<ResolverComponent> imple
         listener.onItemClick(dri);
     }
 
-    public void onButtonClick(View v) {
-        listener.onActionButtonClick(v.getId() == R.id.button_always);
+    @OnClick(R.id.button_always)
+    public void onAlwaysButtonClick() {
+        listener.onActionButtonClick(true);
+    }
+
+    @OnClick(R.id.button_once)
+    public void onOnceButtonClick() {
+        listener.onActionButtonClick(false);
     }
 
     @Override
     public void displayAddToHomeScreenDialog(DisplayResolveInfo dri, Intent intent) {
         AddToHomeScreenDialogFragment
-                .newInstance(dri, intent)
+                .newInstance(dri, Intents.fixIntents(this, intent))
                 .show(getSupportFragmentManager());
     }
 
